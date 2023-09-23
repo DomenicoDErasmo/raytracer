@@ -1,9 +1,5 @@
 use raytracer::logger::log;
 
-fn color_to_u8(float: f32) -> u8 {
-    (((std::u8::MAX as f32 + 1.0) - std::f32::EPSILON) * float) as _
-}
-
 fn main() {
     let image_width = 256;
     let image_height = 256;
@@ -25,14 +21,9 @@ fn main() {
             let green = row as f32 / (image_height - 1) as f32;
             let blue = 0.0;
 
-            let int_red = color_to_u8(red);
-            let int_green = color_to_u8(green);
-            let int_blue = color_to_u8(blue);
-
-            log (
-                &mut logger.stdout,
-                format!("{int_red} {int_green} {int_blue}\n"),
-            );
+            raytracer::color::write_color(
+                &mut logger.stdout, 
+                raytracer::vec3::Color {x: red, y: green, z: blue});
         }
     }
 }
