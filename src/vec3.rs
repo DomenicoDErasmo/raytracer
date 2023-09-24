@@ -5,7 +5,6 @@ pub struct Vec3 {
     pub z: f32,
 }
 
-pub use Vec3 as Color;
 pub use Vec3 as Point3;
 
 impl Vec3 {
@@ -110,6 +109,17 @@ impl std::ops::Mul<f32> for Vec3 {
             x: self.x * rhs,
             y: self.y * rhs,
             z: self.z * rhs,
+        }
+    }
+}
+
+impl std::ops::Mul<Vec3> for f32 {
+    type Output = Vec3;
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        Self::Output {
+            x: rhs.x * self,
+            y: rhs.y * self,
+            z: rhs.z * self,
         }
     }
 }
