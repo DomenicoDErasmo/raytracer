@@ -1,21 +1,14 @@
-use raytracer::{logger::log, ray::Ray, color::Color, vec3::{Point3, Vec3}};
+use raytracer::{logger::log, ray::Ray, color::Color, vec3::{Point3, Vec3}, hit_record::HitRecord, hittable::Hittable, sphere::Sphere, hittable_list::HittableList};
 
-fn ray_color(ray: &Ray) -> Color {
-    if hit_sphere(&Point3 {x: 0.0, y: 0.0, z: -1.0}, 0.5, ray) {
-        return Color {x: 1.0, y: 0.0, z: 0.0};
+fn ray_color(ray: &Ray, world: &mut impl Hittable) -> Color {
+    let mut hit_record = HitRecord::default();
+    if world.hit(ray, 0.0, f32::INFINITY, &mut hit_record) {
+        return 0.5 * (hit_record.normal + Color{x: 1.0, y: 1.0, z: 1.0});
     }
+
     let unit_direction = ray.direction.unit_vector();
     let alpha = 0.5 * (unit_direction.y + 1.0);
     (1.0 - alpha) * Color {x: 1.0, y: 1.0, z: 1.0} + alpha * Color{x: 0.5, y: 0.7, z: 1.0}
-}
-
-fn hit_sphere(center: &Point3, radius: f32, ray: &Ray) -> bool {
-    let oc = ray.origin - *center;
-    let a = ray.direction.length_squared();
-    let b = 2.0 * oc.dot(&ray.direction);
-    let c = oc.length_squared() - radius * radius;
-    let discriminant = b * b - 4.0 * a * c;
-    discriminant > 0.0
 }
 
 fn main() {
@@ -34,6 +27,22 @@ fn main() {
     let viewport_height = 2.0;
     let viewport_width = viewport_height * image_width as f32 / image_height as f32;
     let camera_center = Point3 {x: 0.0, y: 0.0, z: 0.0};
+
+    // World
+
+    let mut world = HittableList {objects: vec![],};
+    world.add(
+        Box::<Sphere>::new(Sphere {
+            center: Point3 {x: 0.0, y: 0.0, z: -1.0},
+            radius: 0.5
+        })
+    );
+    world.add(
+        Box::<Sphere>::new(Sphere {
+            center: Point3 {x: 0.0, y: -100.5, z: -1.0},
+            radius: 100.0,
+        })
+    );
 
     // Calculate the vectors across the horizontal and down the vertical viewport edges
     let viewport_u = Vec3 {x: viewport_width, y: 0.0, z: 0.0};
@@ -64,7 +73,7 @@ fn main() {
             let ray = Ray { origin: camera_center, direction: pixel_center - camera_center };
             
 
-            let pixel_color = ray_color(&ray);
+            let pixel_color = ray_color(&ray, &mut world);
 
             raytracer::color::write_color(&mut logger.stdout, pixel_color);
         }
