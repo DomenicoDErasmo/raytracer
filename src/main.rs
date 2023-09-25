@@ -1,8 +1,8 @@
-use raytracer::{logger::log, ray::Ray, color::Color, vec3::{Point3, Vec3}, hit_record::HitRecord, hittable::Hittable, sphere::Sphere, hittable_list::HittableList};
+use raytracer::{logger::log, ray::Ray, color::Color, vec3::{Point3, Vec3}, hit_record::HitRecord, hittable::Hittable, sphere::Sphere, hittable_list::HittableList, interval::Interval};
 
 fn ray_color(ray: &Ray, world: &mut impl Hittable) -> Color {
     let mut hit_record = HitRecord::default();
-    if world.hit(ray, 0.0, f32::INFINITY, &mut hit_record) {
+    if world.hit(ray, Interval {min: 0.0, max: f32::INFINITY}, &mut hit_record) {
         return 0.5 * (hit_record.normal + Color{x: 1.0, y: 1.0, z: 1.0});
     }
 

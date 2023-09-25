@@ -2,6 +2,7 @@ pub mod color;
 pub mod hit_record;
 pub mod hittable;
 pub mod hittable_list;
+pub mod interval;
 pub mod logger;
 pub mod ray;
 pub mod sphere;
