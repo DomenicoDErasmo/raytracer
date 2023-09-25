@@ -144,3 +144,11 @@ impl std::ops::DivAssign<f32> for Vec3 {
         *self *= 1.0/rhs;
     }
 }
+
+#[derive(Default)]
+pub struct Vec2<T> 
+where T: std::ops::Add, 
+{
+    pub width: T,
+    pub height: T,
+}

@@ -1,3 +1,4 @@
+pub mod camera;
 pub mod color;
 pub mod hit_record;
 pub mod hittable;
@@ -7,4 +8,4 @@ pub mod logger;
 pub mod ray;
 pub mod sphere;
 pub mod util;
-pub mod vec3;
+pub mod vec;

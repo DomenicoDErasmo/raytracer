@@ -1,4 +1,4 @@
-pub use super::vec3::Vec3 as Color;
+pub use super::vec::Vec3 as Color;
 
 fn color_to_u8(float: f32) -> u8 {
     (((std::u8::MAX as f32 + 1.0) - std::f32::EPSILON) * float) as _

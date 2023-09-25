@@ -1,6 +1,6 @@
 use crate::ray::Ray;
 
-use super::vec3::{Point3, Vec3};
+use super::vec::{Point3, Vec3};
 
 #[derive(Clone, Copy, Default)]
 pub struct HitRecord {
