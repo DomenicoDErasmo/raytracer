@@ -1,6 +1,6 @@
-use rand::prelude::Distribution;
+use std::f32::consts::PI;
 
-pub const PI: f32 = 3.1415926535897932385;
+use rand::prelude::Distribution;
 
 pub fn degrees_to_radians(degrees: f32) -> f32 {
     degrees * PI / 180.0

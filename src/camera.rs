@@ -5,7 +5,7 @@ use crate::{
     hit_record::HitRecord, 
     interval::Interval, 
     logger::{Logger, log},
-    vec::{Point3, Vec3, Vec2}, util::random_double,
+    vec::{Point3, Vec3, Vec2}, util::{random_double, degrees_to_radians},
 };
 
 pub struct Camera {
@@ -13,6 +13,7 @@ pub struct Camera {
     pub image: Vec2<i32>,
     pub samples_per_pixel: i32,
     pub max_depth: i32,
+    pub vfov: f32,
     center: Point3,
     pixel00_loc: Point3,
     pixel_delta: Vec2<Vec3>,
@@ -25,6 +26,7 @@ impl Default for Camera {
             image: Vec2 {width: 100, height: 0},
             samples_per_pixel: 10,
             max_depth: 10,
+            vfov: 90.0,
             center: Point3::default(),
             pixel00_loc: Vec3::default(),
             pixel_delta: Vec2::default(),
@@ -64,8 +66,12 @@ impl Camera {
         self.samples_per_pixel = 100;
         self.image.height = ((self.image.width as f32 / self.aspect_ratio) as i32).max(1);
 
-        // Camera
-        let viewport_height = 2.0;
+        // Determine viewport dimensions
+        let focal_length = 1.0;
+        let theta = degrees_to_radians(self.vfov);
+        let h = (theta / 2.0).tan();
+
+        let viewport_height = 2.0 * h * focal_length;
         let viewport_width = viewport_height 
             * self.image.width as f32 
             / self.image.height as f32;
@@ -82,7 +88,6 @@ impl Camera {
         self.pixel_delta.height = viewport.height / self.image.height as _;
 
         // Calculate the location of the upper left pixel
-        let focal_length = 1.0;
         let viewport_upper_left = self.center 
             - Vec3 {x: 0.0, y: 0.0, z: focal_length} 
             - viewport.width / 2.0 - viewport.height / 2.0;
