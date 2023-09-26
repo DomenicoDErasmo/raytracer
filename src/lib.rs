@@ -1,5 +1,6 @@
 pub mod camera;
 pub mod color;
+pub mod dielectric;
 pub mod hit_record;
 pub mod hittable;
 pub mod hittable_list;
