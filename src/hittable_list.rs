@@ -17,19 +17,20 @@ impl Hittable for HittableList {
         ray_time: Interval,
         hit_record: &mut HitRecord
     ) -> bool {
-        let mut temp_hit_record = HitRecord::default();    
+        let temp_hit_record = HitRecord::default();    
         let mut hit_anything = false;
         let mut closest_so_far = ray_time.max;
 
         for object in self.objects.iter_mut() {
+            let mut temp_hit_record_clone = temp_hit_record.clone();
             if object.hit(
                 ray, 
                 Interval {min: ray_time.min, max: closest_so_far}, 
-                &mut temp_hit_record
+                &mut temp_hit_record_clone,
             ) {
                 hit_anything = true;
-                closest_so_far = temp_hit_record.time;
-                *hit_record = temp_hit_record;
+                closest_so_far = temp_hit_record_clone.time;
+                *hit_record = temp_hit_record_clone;
             }
         }
         

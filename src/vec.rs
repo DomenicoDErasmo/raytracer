@@ -41,6 +41,10 @@ impl Vec3 {
             z: random_double(min, max),
         }
     }
+
+    pub fn near_zero(&self) -> bool {
+        self.x < f32::EPSILON && self.y < f32::EPSILON && self.z < f32::EPSILON
+    }
 }
 
 pub fn random_in_unit_sphere() -> Vec3 {
@@ -59,6 +63,10 @@ pub fn random_unit_vector() -> Vec3 {
 pub fn random_on_hemisphere(normal: &Vec3) -> Vec3 {
     let on_unit_sphere = random_unit_vector();
     return  if on_unit_sphere.dot(normal) > 0.0 {on_unit_sphere} else {-on_unit_sphere}
+}
+
+pub fn reflect(vec: &Vec3, normal: &Vec3) -> Vec3 {
+    *vec - 2.0 * vec.dot(normal) * *normal
 }
 
 impl std::ops::Neg for Vec3 {
@@ -127,6 +135,25 @@ impl std::ops::SubAssign for Vec3 {
         self.x -= rhs.x;
         self.y -= rhs.y;
         self.z -= rhs.z;
+    }
+}
+
+impl std::ops::Mul for Vec3 {
+    type Output = Self;
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x * rhs.x,
+            y: self.y * rhs.y,
+            z: self.z * rhs.z,
+        }
+    }
+}
+
+impl std::ops::MulAssign for Vec3 {
+    fn mul_assign(&mut self, rhs: Self) {
+        self.x *= rhs.x;
+        self.y *= rhs.y;
+        self.z *= rhs.z;
     }
 }
 

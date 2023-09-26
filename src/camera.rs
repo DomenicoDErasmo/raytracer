@@ -5,7 +5,7 @@ use crate::{
     hit_record::HitRecord, 
     interval::Interval, 
     logger::{Logger, log},
-    vec::{Point3, Vec3, Vec2, random_on_hemisphere}, util::random_double,
+    vec::{Point3, Vec3, Vec2}, util::random_double,
 };
 
 pub struct Camera {
@@ -98,12 +98,17 @@ impl Camera {
         if depth <= 0 {return Color {x: 0.0, y: 0.0, z: 0.0};}
 
         if world.hit(ray, Interval {min: 0.001, max: f32::INFINITY}, &mut hit_record) {
-            let direction = hit_record.normal + random_on_hemisphere(&hit_record.normal);
-            return 0.5 * self.ray_color(
-                &Ray{origin: hit_record.point, direction}, 
-                depth - 1, 
-                world
-            );
+            let mut scattered = Ray::default();
+            let mut attenuation = Color::default();
+            if hit_record.material.scatter(
+                &ray, 
+                &hit_record, 
+                &mut attenuation, 
+                &mut scattered
+            ) {
+                return attenuation * self.ray_color(&scattered, depth - 1, world);
+            }
+            return Color {x: 0.0, y: 0.0, z: 0.0};
         }
     
         let unit_direction = ray.direction.unit_vector();
