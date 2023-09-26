@@ -7,6 +7,8 @@ pub struct Vec3 {
 
 pub use Vec3 as Point3;
 
+use crate::util::random_double;
+
 impl Vec3 {
     pub fn length_squared(&self) -> f32 {
         self.x * self.x + self.y * self.y + self.z * self.z
@@ -31,6 +33,32 @@ impl Vec3 {
     pub fn unit_vector(&self) -> Self {
         *self / self.length()
     }
+
+    pub fn random(min: Option<f32>, max: Option<f32>) -> Self {
+        Self {
+            x: random_double(min, max),
+            y: random_double(min, max),
+            z: random_double(min, max),
+        }
+    }
+}
+
+pub fn random_in_unit_sphere() -> Vec3 {
+    loop {
+        let p = Vec3::random(Some(-1.0), Some(1.0));
+        if p.length_squared() < 1.0 {
+            return p;
+        }
+    }
+}
+
+pub fn random_unit_vector() -> Vec3 {
+    random_in_unit_sphere().unit_vector()
+}
+
+pub fn random_on_hemisphere(normal: &Vec3) -> Vec3 {
+    let on_unit_sphere = random_unit_vector();
+    return  if on_unit_sphere.dot(normal) > 0.0 {on_unit_sphere} else {-on_unit_sphere}
 }
 
 impl std::ops::Neg for Vec3 {

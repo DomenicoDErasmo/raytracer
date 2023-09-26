@@ -5,13 +5,14 @@ use crate::{
     hit_record::HitRecord, 
     interval::Interval, 
     logger::{Logger, log},
-    vec::{Point3, Vec3, Vec2}, util::random_double,
+    vec::{Point3, Vec3, Vec2, random_on_hemisphere}, util::random_double,
 };
 
 pub struct Camera {
     pub aspect_ratio: f32,
     pub image: Vec2<i32>,
     pub samples_per_pixel: i32,
+    pub max_depth: i32,
     center: Point3,
     pixel00_loc: Point3,
     pixel_delta: Vec2<Vec3>,
@@ -23,8 +24,9 @@ impl Default for Camera {
             aspect_ratio: 1.0,
             image: Vec2 {width: 100, height: 0},
             samples_per_pixel: 10,
+            max_depth: 10,
             center: Point3::default(),
-            pixel00_loc: Point3::default(),
+            pixel00_loc: Vec3::default(),
             pixel_delta: Vec2::default(),
         }
     }
@@ -48,7 +50,7 @@ impl Camera {
                 let mut pixel_color = Color::default();
                 for _ in 0..self.samples_per_pixel {
                     let ray = self.get_ray(i, j);
-                    pixel_color += self.ray_color(&ray, world);
+                    pixel_color += self.ray_color(&ray, self.max_depth, world);
                 }
                 write_color(&mut logger.stdout, pixel_color, self.samples_per_pixel);
             }
@@ -89,10 +91,19 @@ impl Camera {
             * (self.pixel_delta.width + self.pixel_delta.height);
     }
     
-    fn ray_color(&mut self, ray: &Ray, world: &mut impl Hittable) -> Color {
+    fn ray_color(&mut self, ray: &Ray, depth: i32, world: &mut impl Hittable) -> Color {
         let mut hit_record = HitRecord::default();
+
+        // If we've exceeded the ray bounce limit, no more light is gathered
+        if depth <= 0 {return Color {x: 0.0, y: 0.0, z: 0.0};}
+
         if world.hit(ray, Interval {min: 0.0, max: f32::INFINITY}, &mut hit_record) {
-            return 0.5 * (hit_record.normal + Color{x: 1.0, y: 1.0, z: 1.0});
+            let direction = random_on_hemisphere(&hit_record.normal);
+            return 0.5 * self.ray_color(
+                &Ray{origin: hit_record.point, direction}, 
+                depth - 1, 
+                world
+            );
         }
     
         let unit_direction = ray.direction.unit_vector();
@@ -111,8 +122,8 @@ impl Camera {
     }
 
     fn pixel_sample_square(&self) -> Vec3 {
-        let px = -0.5 + random_double();
-        let py = -0.5 + random_double();
+        let px = -0.5 + random_double(None, None);
+        let py = -0.5 + random_double(None, None);
         px * self.pixel_delta.width + py * self.pixel_delta.height
     }
 }
