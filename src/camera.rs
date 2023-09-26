@@ -97,7 +97,7 @@ impl Camera {
         // If we've exceeded the ray bounce limit, no more light is gathered
         if depth <= 0 {return Color {x: 0.0, y: 0.0, z: 0.0};}
 
-        if world.hit(ray, Interval {min: 0.0, max: f32::INFINITY}, &mut hit_record) {
+        if world.hit(ray, Interval {min: 0.001, max: f32::INFINITY}, &mut hit_record) {
             let direction = random_on_hemisphere(&hit_record.normal);
             return 0.5 * self.ray_color(
                 &Ray{origin: hit_record.point, direction}, 
