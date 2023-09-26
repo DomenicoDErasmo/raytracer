@@ -24,10 +24,10 @@ fn main() {
         Lambertian { albedo: Color {x: 0.7, y: 0.3, z: 0.3} }
     );
     let left = Box::<_>::new(
-        Metal { albedo: Color {x: 0.8, y: 0.8, z: 0.8 } }
+        Metal::new(&Color {x: 0.8, y: 0.8, z: 0.8}, 0.3)
     );
     let right = Box::<_>::new(
-        Metal { albedo: Color {x: 0.8, y: 0.6, z: 0.2 } }
+        Metal::new(&Color {x: 0.8, y: 0.6, z: 0.2}, 1.0)
     );
 
     world.add(Box::<Sphere>::new(Sphere {
