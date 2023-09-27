@@ -76,6 +76,17 @@ pub fn refract(uv: &Vec3, normal: &Vec3, etai_over_etat:f32) -> Vec3 {
     r_out_perp + r_out_parallel
 }
 
+pub fn random_in_unit_disk() -> Vec3 {
+    loop {
+        let p = Vec3 {
+            x: random_double(Some(-1.0), Some(1.0)), 
+            y: random_double(Some(-1.0), Some(1.0)), 
+            z: 0.0
+        };
+        if p.length_squared() < 1.0 {return p;}
+    }
+}
+
 impl std::ops::Neg for Vec3 {
     type Output = Self;
     fn neg(self) -> Self::Output {
