@@ -1,5 +1,5 @@
 use raytracer::{
-    vec::Point3, 
+    vec::{Point3, Vec3}, 
     sphere::Sphere, 
     hittable_list::HittableList, 
     camera::Camera, 
@@ -25,6 +25,8 @@ fn main() {
         center: Point3 {x: 0.0, y: -1000.0, z: 0.0},
         radius: 1000.0,
         material: ground_material,
+        is_moving: false,
+        center_vec: Vec3 {x: 0.0, y: 0.0, z: 0.0},
     }));
 
     for a in -11..11 {
@@ -46,7 +48,9 @@ fn main() {
     world.add(Box::<_>::new(Sphere {
         center: Point3 {x: 0.0, y: 1.0, z: 0.0}, 
         radius: 1.0, 
-        material: big_dielectric_sphere_material
+        material: big_dielectric_sphere_material,
+        is_moving: false,
+        center_vec: Vec3 {x: 0.0, y: 0.0, z: 0.0},
     }));
 
     let big_lambertian_sphere_material = Box::<_>::new(
@@ -55,7 +59,9 @@ fn main() {
     world.add(Box::<_>::new(Sphere {
         center: Point3 {x: -4.0, y: 1.0, z: 0.0}, 
         radius: 1.0, 
-        material: big_lambertian_sphere_material
+        material: big_lambertian_sphere_material,
+        is_moving: false,
+        center_vec: Vec3 {x: 0.0, y: 0.0, z: 0.0},
     }));
 
     let big_metal_sphere_material = Box::<_>::new(
@@ -64,7 +70,9 @@ fn main() {
     world.add(Box::<_>::new(Sphere {
         center: Point3 {x: 4.0, y: 1.0, z: 0.0}, 
         radius: 1.0, 
-        material: big_metal_sphere_material
+        material: big_metal_sphere_material,
+        is_moving: false,
+        center_vec: Vec3 {x: 0.0, y: 0.0, z: 0.0},
     }));
 
     let mut camera = Camera::default();
@@ -85,7 +93,13 @@ fn choose_material_from_rng(world: &mut HittableList, material_rng: f32, center:
         world.add(Box::<_>::new(Sphere {
             center: *center, 
             radius: 0.2, 
-            material: sphere_material
+            material: sphere_material,
+            is_moving: true,
+            center_vec: Vec3 {
+                x: 0.0, 
+                y: random_double(Some(0.0), Some(0.5)), 
+                z: 0.0
+            },
         }));
     } else if material_rng < 0.95 {
         let albedo = Color::random(Some(0.5), Some(1.0));
@@ -94,14 +108,18 @@ fn choose_material_from_rng(world: &mut HittableList, material_rng: f32, center:
         world.add(Box::<_>::new(Sphere {
             center: *center, 
             radius: 0.2, 
-            material: sphere_material
+            material: sphere_material,
+            is_moving: false,
+            center_vec: Vec3 {x: 0.0, y: 0.0, z: 0.0},
         }));
     } else {
         let sphere_material = Box::<_>::new(Dielectric {ir: 1.5});
         world.add(Box::<_>::new(Sphere {
             center: *center, 
             radius: 0.2, 
-            material: sphere_material
+            material: sphere_material,
+            is_moving: false,
+            center_vec: Vec3 {x: 0.0, y: 0.0, z: 0.0},
         }));
     }
 }

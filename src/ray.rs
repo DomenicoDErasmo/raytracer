@@ -4,6 +4,7 @@ use super::vec::{Point3, Vec3};
 pub struct Ray {
     pub origin: Point3,
     pub direction: Vec3,
+    pub time: f32,
 }
 
 impl Ray {

@@ -34,7 +34,7 @@ impl Material for Dielectric {
         } else {
             refract(&unit_direction, &hit_record.normal, refraction_ratio)
         };
-        *scattered = Ray {origin: hit_record.point, direction};
+        *scattered = Ray {origin: hit_record.point, direction, time: in_ray.time};
         true
     }
 }
