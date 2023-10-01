@@ -6,17 +6,15 @@ use crate::ray::Ray;
 use super::vec::{Point3, Vec3};
 
 pub struct Sphere {
+    /// The center of the sphere.
     pub center: Point3,
+    /// The radius of the sphere.
     pub radius: f32,
+    /// Determines how rays of light act when they hit the surface.
     pub material: Box<dyn Material>,
-    pub is_moving: bool,
-    pub center_vec: Vec3,
-}
-
-impl Sphere {
-    fn center(&self, time: f32) -> Point3 {
-        self.center + time * self.center_vec
-    }
+    /// Gives the direction that the ball is moving in. 
+    /// Should be a zero vector if is_moving is false.
+    pub center_vec: Option<Vec3>,
 }
 
 impl Hittable for Sphere {
@@ -27,7 +25,10 @@ impl Hittable for Sphere {
         hit_record: 
         &mut HitRecord
     ) -> bool {
-        let center = if self.is_moving {self.center(ray.time)} else {self.center};
+        let center = match self.center_vec {
+            Some(vector) => self.center + ray.time * vector,
+            None => self.center,
+        };
         let oc = ray.origin - center;
         let a = ray.direction.length_squared();
         let half_b = oc.dot(&ray.direction);

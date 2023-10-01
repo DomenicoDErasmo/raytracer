@@ -25,8 +25,7 @@ fn main() {
         center: Point3 {x: 0.0, y: -1000.0, z: 0.0},
         radius: 1000.0,
         material: ground_material,
-        is_moving: false,
-        center_vec: Vec3 {x: 0.0, y: 0.0, z: 0.0},
+        center_vec: None,
     }));
 
     for a in -11..11 {
@@ -49,8 +48,7 @@ fn main() {
         center: Point3 {x: 0.0, y: 1.0, z: 0.0}, 
         radius: 1.0, 
         material: big_dielectric_sphere_material,
-        is_moving: false,
-        center_vec: Vec3 {x: 0.0, y: 0.0, z: 0.0},
+        center_vec: None,
     }));
 
     let big_lambertian_sphere_material = Box::<_>::new(
@@ -60,8 +58,7 @@ fn main() {
         center: Point3 {x: -4.0, y: 1.0, z: 0.0}, 
         radius: 1.0, 
         material: big_lambertian_sphere_material,
-        is_moving: false,
-        center_vec: Vec3 {x: 0.0, y: 0.0, z: 0.0},
+        center_vec: None,
     }));
 
     let big_metal_sphere_material = Box::<_>::new(
@@ -71,8 +68,7 @@ fn main() {
         center: Point3 {x: 4.0, y: 1.0, z: 0.0}, 
         radius: 1.0, 
         material: big_metal_sphere_material,
-        is_moving: false,
-        center_vec: Vec3 {x: 0.0, y: 0.0, z: 0.0},
+        center_vec: None,
     }));
 
     let mut camera = Camera::default();
@@ -94,12 +90,11 @@ fn choose_material_from_rng(world: &mut HittableList, material_rng: f32, center:
             center: *center, 
             radius: 0.2, 
             material: sphere_material,
-            is_moving: true,
-            center_vec: Vec3 {
+            center_vec: Some(Vec3 {
                 x: 0.0, 
                 y: random_double(Some(0.0), Some(0.5)), 
                 z: 0.0
-            },
+            }),
         }));
     } else if material_rng < 0.95 {
         let albedo = Color::random(Some(0.5), Some(1.0));
@@ -109,8 +104,7 @@ fn choose_material_from_rng(world: &mut HittableList, material_rng: f32, center:
             center: *center, 
             radius: 0.2, 
             material: sphere_material,
-            is_moving: false,
-            center_vec: Vec3 {x: 0.0, y: 0.0, z: 0.0},
+            center_vec: None,
         }));
     } else {
         let sphere_material = Box::<_>::new(Dielectric {ir: 1.5});
@@ -118,8 +112,7 @@ fn choose_material_from_rng(world: &mut HittableList, material_rng: f32, center:
             center: *center, 
             radius: 0.2, 
             material: sphere_material,
-            is_moving: false,
-            center_vec: Vec3 {x: 0.0, y: 0.0, z: 0.0},
+            center_vec: None,
         }));
     }
 }
