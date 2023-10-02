@@ -7,7 +7,7 @@ pub struct Vec3 {
 
 pub use Vec3 as Point3;
 
-use crate::util::random_double;
+use crate::{util::random_float, axis::{AxisIndex, Axis}};
 
 impl Vec3 {
     pub fn length_squared(&self) -> f32 {
@@ -36,9 +36,9 @@ impl Vec3 {
 
     pub fn random(min: Option<f32>, max: Option<f32>) -> Self {
         Self {
-            x: random_double(min, max),
-            y: random_double(min, max),
-            z: random_double(min, max),
+            x: random_float(min, max),
+            y: random_float(min, max),
+            z: random_float(min, max),
         }
     }
 
@@ -79,8 +79,8 @@ pub fn refract(uv: &Vec3, normal: &Vec3, etai_over_etat:f32) -> Vec3 {
 pub fn random_in_unit_disk() -> Vec3 {
     loop {
         let p = Vec3 {
-            x: random_double(Some(-1.0), Some(1.0)), 
-            y: random_double(Some(-1.0), Some(1.0)), 
+            x: random_float(Some(-1.0), Some(1.0)), 
+            y: random_float(Some(-1.0), Some(1.0)), 
             z: 0.0
         };
         if p.length_squared() < 1.0 {return p;}
@@ -91,30 +91,6 @@ impl std::ops::Neg for Vec3 {
     type Output = Self;
     fn neg(self) -> Self::Output {
         Self {x: -self.x, y: -self.y, z: -self.z}
-    }
-}
-
-impl std::ops::Index<usize> for Vec3 {
-    type Output = f32;
-
-    fn index(&self, index: usize) -> &Self::Output {
-        match index {
-            0 => &self.x,
-            1 => &self.y,
-            2 => &self.z,
-            _ => panic!("Can only index for 0, 1, or 2"),
-        }
-    }
-}
-
-impl std::ops::IndexMut<usize> for Vec3 {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        match index {
-            0 => &mut self.x,
-            1 => &mut self.y,
-            2 => &mut self.z,
-            _ => panic!("Can only index for 0, 1, or 2"),
-        }
     }
 }
 
@@ -215,6 +191,16 @@ impl std::ops::Div<f32> for Vec3 {
 impl std::ops::DivAssign<f32> for Vec3 {
     fn div_assign(&mut self, rhs: f32) {
         *self *= 1.0/rhs;
+    }
+}
+
+impl AxisIndex<f32> for Vec3 {
+    fn axis(&self, axis: &crate::axis::Axis) -> f32 {
+        match axis {
+            Axis::X => self.x,
+            Axis::Y => self.y,
+            Axis::Z => self.z,
+        }
     }
 }
 

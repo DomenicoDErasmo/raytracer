@@ -5,7 +5,7 @@ use crate::{
     hit_record::HitRecord, 
     interval::Interval, 
     logger::{Logger, log},
-    vec::{Point3, Vec3, Vec2, random_in_unit_disk}, util::{random_double, degrees_to_radians},
+    vec::{Point3, Vec3, Vec2, random_in_unit_disk}, util::{random_float, degrees_to_radians},
 };
 
 pub struct Camera {
@@ -163,13 +163,13 @@ impl Camera {
         } else {
             self.defocus_disk_sample()
         };
-        let time = random_double(None, None);
+        let time = random_float(None, None);
         Ray {origin, direction: pixel_sample - origin, time}
     }
 
     fn pixel_sample_square(&self) -> Vec3 {
-        let px = -0.5 + random_double(None, None);
-        let py = -0.5 + random_double(None, None);
+        let px = -0.5 + random_float(None, None);
+        let py = -0.5 + random_float(None, None);
         px * self.pixel_delta.width + py * self.pixel_delta.height
     }
 

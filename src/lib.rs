@@ -1,3 +1,6 @@
+pub mod aabb;
+pub mod axis;
+pub mod bvh;
 pub mod camera;
 pub mod color;
 pub mod dielectric;

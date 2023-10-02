@@ -6,7 +6,7 @@ use raytracer::{
     lambertian::Lambertian,
     color::Color, 
     metal::Metal,
-    dielectric::Dielectric, util::random_double,
+    dielectric::Dielectric, util::random_float, aabb::AABB,
 };
 
 
@@ -16,25 +16,25 @@ fn main() {
         stderr: std::io::stderr().lock(),
     };
 
-    let mut world = HittableList {objects: vec![],};
+    let mut world = HittableList {objects: vec![], bounding_box: AABB::default()};
 
     let ground_material = Box::<_>::new(
         Lambertian {albedo: Color {x: 0.5, y: 0.5, z: 0.5,}}
     );
-    world.add(Box::<_>::new(Sphere {
-        center: Point3 {x: 0.0, y: -1000.0, z: 0.0},
-        radius: 1000.0,
-        material: ground_material,
-        center_vec: None,
-    }));
+    let ground_sphere = Sphere::make_stationary_sphere(
+        Point3 {x: 0.0, y: -1000.0, z: 0.0}, 
+        -1000.0, 
+        ground_material,
+    );
+    world.add(Box::<_>::new(ground_sphere));
 
     for a in -11..11 {
         for b in -11..11 {
-            let material_rng = random_double(None, None);
+            let material_rng = random_float(None, None);
             let center = Point3 {
-                x: a as f32 + 0.9 * random_double(None, None),
+                x: a as f32 + 0.9 * random_float(None, None),
                 y: 0.2,
-                z: b as f32 + 0.9 * random_double(None, None),
+                z: b as f32 + 0.9 * random_float(None, None),
             };
 
             if (center - Point3 {x: 4.0, y: 0.2, z: 0.0}).length() > 0.9 {
@@ -44,32 +44,32 @@ fn main() {
     }
 
     let big_dielectric_sphere_material = Box::<_>::new(Dielectric {ir: 1.5});
-    world.add(Box::<_>::new(Sphere {
-        center: Point3 {x: 0.0, y: 1.0, z: 0.0}, 
-        radius: 1.0, 
-        material: big_dielectric_sphere_material,
-        center_vec: None,
-    }));
+    let big_dielectric_sphere = Sphere::make_stationary_sphere(
+        Point3 {x: 0.0, y: 1.0, z: 0.0}, 
+        1.0, 
+        big_dielectric_sphere_material
+    );
+    world.add(Box::<_>::new(big_dielectric_sphere));
 
     let big_lambertian_sphere_material = Box::<_>::new(
         Lambertian {albedo: Color {x: 0.4, y: 0.2, z: 0.1}}
     );
-    world.add(Box::<_>::new(Sphere {
-        center: Point3 {x: -4.0, y: 1.0, z: 0.0}, 
-        radius: 1.0, 
-        material: big_lambertian_sphere_material,
-        center_vec: None,
-    }));
+    let big_lambertian_sphere = Sphere::make_stationary_sphere(
+        Point3 {x: -4.0, y: 1.0, z: 0.0},
+        1.0, 
+        big_lambertian_sphere_material
+    );
+    world.add(Box::<_>::new(big_lambertian_sphere));
 
     let big_metal_sphere_material = Box::<_>::new(
         Metal {albedo: Color {x: 0.7, y: 0.6, z: 0.5}, fuzz: 0.0}
     );
-    world.add(Box::<_>::new(Sphere {
-        center: Point3 {x: 4.0, y: 1.0, z: 0.0}, 
-        radius: 1.0, 
-        material: big_metal_sphere_material,
-        center_vec: None,
-    }));
+    let big_metal_sphere = Sphere::make_stationary_sphere(
+        Point3 {x: 4.0, y: 1.0, z: 0.0}, 
+        1.0, 
+        big_metal_sphere_material
+    );
+    world.add(Box::<_>::new(big_metal_sphere));
 
     let mut camera = Camera::default();
     camera.samples_per_pixel = 100;
@@ -86,33 +86,34 @@ fn choose_material_from_rng(world: &mut HittableList, material_rng: f32, center:
     if material_rng < 0.8 {
         let albedo = Color::random(None, None);
         let sphere_material = Box::<_>::new(Lambertian {albedo});
-        world.add(Box::<_>::new(Sphere {
-            center: *center, 
-            radius: 0.2, 
-            material: sphere_material,
-            center_vec: Some(Vec3 {
-                x: 0.0, 
-                y: random_double(Some(0.0), Some(0.5)), 
-                z: 0.0
-            }),
-        }));
+        let moving_lambertian_sphere = Sphere::make_moving_sphere(
+            *center, 
+            *center + Vec3 {
+                x: 0.0,
+                y: random_float(Some(0.0), Some(0.5)),
+                z: 0.0,
+            }, 
+            0.2, 
+            sphere_material
+        );
+        world.add(Box::<_>::new(moving_lambertian_sphere));
     } else if material_rng < 0.95 {
         let albedo = Color::random(Some(0.5), Some(1.0));
-        let fuzz = random_double(Some(0.0), Some(0.5));
+        let fuzz = random_float(Some(0.0), Some(0.5));
         let sphere_material = Box::<_>::new(Metal {albedo, fuzz});
-        world.add(Box::<_>::new(Sphere {
-            center: *center, 
-            radius: 0.2, 
-            material: sphere_material,
-            center_vec: None,
-        }));
+        let stationary_metal_sphere = Sphere::make_stationary_sphere(
+            *center, 
+            0.2, 
+            sphere_material,
+        );
+        world.add(Box::<_>::new(stationary_metal_sphere));
     } else {
         let sphere_material = Box::<_>::new(Dielectric {ir: 1.5});
-        world.add(Box::<_>::new(Sphere {
-            center: *center, 
-            radius: 0.2, 
-            material: sphere_material,
-            center_vec: None,
-        }));
+        let stationary_dielectric_sphere = Sphere::make_stationary_sphere(
+            *center, 
+            0.2, 
+            sphere_material,
+        );
+        world.add(Box::<_>::new(stationary_dielectric_sphere));
     }
 }

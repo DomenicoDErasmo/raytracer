@@ -14,6 +14,13 @@ impl Default for Interval {
 }
 
 impl Interval {
+    pub fn from_two_intervals(a: &Interval, b: &Interval) -> Self {
+        Self {
+            min: a.min.min(b.min),
+            max: a.max.max(b.max),
+        }
+    }
+
     pub fn contains(&self, x: f32) -> bool {
         (self.min..=self.max).contains(&x)
     }
@@ -26,6 +33,18 @@ impl Interval {
         if x < self.min {return self.min;}
         if x > self.max {return self.max;}
         x
+    }
+
+    pub fn size(&self) -> f32 {
+        self.max - self.min
+    }
+
+    pub fn expand(&self, delta: f32) -> Self {
+        let padding = delta / 2.0;
+        Self {
+            max: self.max + padding,
+            min: self.min - padding,
+        }
     }
 }
 
