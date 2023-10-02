@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use raytracer::{
     vec::{Point3, Vec3}, 
     sphere::Sphere, 
@@ -6,7 +8,7 @@ use raytracer::{
     lambertian::Lambertian,
     color::Color, 
     metal::Metal,
-    dielectric::Dielectric, util::random_float, aabb::AABB,
+    dielectric::Dielectric, util::random_float, aabb::AABB, bvh::BVHNode,
 };
 
 
@@ -70,6 +72,18 @@ fn main() {
         big_metal_sphere_material
     );
     world.add(Box::<_>::new(big_metal_sphere));
+    let mut world_vec_deque = VecDeque::from(world.objects);
+    let length = world_vec_deque.len();
+    let bvh_objects = BVHNode::from_objects_and_times(
+        &mut world_vec_deque, 
+        0, 
+        length,
+    );
+    let bounding_box = bvh_objects.bounding_box;
+    world = HittableList {
+        objects: vec![Box::<_>::new(bvh_objects)],
+        bounding_box,
+    };
 
     let mut camera = Camera::default();
     camera.samples_per_pixel = 100;

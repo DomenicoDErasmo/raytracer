@@ -20,7 +20,7 @@ impl AABB {
         }
     }
 
-    pub fn from_aabbs(box0: &AABB, box1: &AABB) -> Self {
+    pub fn from_boxes(box0: &AABB, box1: &AABB) -> Self {
         Self {
             x: Interval::from_two_intervals(&box0.x, &box1.x),
             y: Interval::from_two_intervals(&box0.y, &box1.y),

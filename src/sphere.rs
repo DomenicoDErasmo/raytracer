@@ -53,7 +53,7 @@ impl Sphere {
             &(end_center - radius_vector), 
             &(end_center + radius_vector)
         );
-        let bounding_box = AABB::from_aabbs(&start_bounding_box, &end_bounding_box);
+        let bounding_box = AABB::from_boxes(&start_bounding_box, &end_bounding_box);
         Self {
             center: start_center,
             radius,

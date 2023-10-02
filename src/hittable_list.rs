@@ -9,7 +9,7 @@ impl HittableList {
     pub fn add(&mut self, object: Box<dyn Hittable>) {
         let bounding_box = object.bounding_box();
         self.objects.insert(0, object);
-        self.bounding_box = AABB::from_aabbs(
+        self.bounding_box = AABB::from_boxes(
             &self.bounding_box, 
             &bounding_box
         );
