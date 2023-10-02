@@ -8,6 +8,7 @@ pub struct BVHNode {
     pub right: Option<Box<dyn Hittable>>,
 }
 
+// TODO: fix
 impl BVHNode {
     pub fn from_objects_and_times(
         source_objects: &Vec<Box<dyn Hittable>>, 
