@@ -14,18 +14,14 @@ pub struct Lambertian {
 impl Material for Lambertian {
     fn scatter(
             &self,
-            in_ray: &Ray,
+            _: &Ray,
             hit_record: &HitRecord,
             attenuation: &mut Color,
             scattered: &mut Ray
         ) -> bool {
         let mut scatter_direction = hit_record.normal + random_unit_vector();
         if scatter_direction.near_zero() {scatter_direction = hit_record.normal;}
-        *scattered = Ray {
-            origin: hit_record.point, 
-            direction: scatter_direction, 
-            time: in_ray.time
-        };
+        *scattered = Ray {origin: hit_record.point, direction: scatter_direction};
         *attenuation = self.albedo;
         true
     }

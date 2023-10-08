@@ -8,4 +8,3 @@ edition = "2021"
 [dependencies]
 dyn-clone = "1.0.14"
 rand = "0.8.4"
-strum = { version = "0.25", features = ["derive"] }

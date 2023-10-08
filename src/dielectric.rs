@@ -1,4 +1,4 @@
-use crate::{material::Material, color::Color, vec::{refract, reflect}, ray::Ray, util::random_float};
+use crate::{material::Material, color::Color, vec::{refract, reflect}, ray::Ray, util::random_double};
 
 #[derive(Clone)]
 pub struct Dielectric {
@@ -29,12 +29,12 @@ impl Material for Dielectric {
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
         let direction = if cannot_refract 
                 || reflectance(cos_theta, refraction_ratio) 
-                > random_float(None, None) {
+                > random_double(None, None) {
             reflect(&unit_direction, &hit_record.normal)
         } else {
             refract(&unit_direction, &hit_record.normal, refraction_ratio)
         };
-        *scattered = Ray {origin: hit_record.point, direction, time: in_ray.time};
+        *scattered = Ray {origin: hit_record.point, direction};
         true
     }
 }
